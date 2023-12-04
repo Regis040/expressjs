@@ -1,66 +1,90 @@
 const express = require('express')
 const router = express.Router()
 const { Coworking } = require('../db/sequelizeSetup')
-let mockCoworkings = require('../mock-coworkings')
+
 
 router
     .route('/')
     .get((req, res) => {
-        res.json(mockCoworkings)
+    
+        Coworking.findAll () // findAll te renvoit une promesse: on evnoie toute la table, "findAll" est une méthode, tout comme "create"
+        .then((results) => { // système de promesse
+            res.json(results)
+        })
+        .catch(error => {
+            res.json(error.message)
+        })
     })
     .post((req, res) => {
-        // const newId = mockCoworkings[mockCoworkings.length - 1].id + 1
-        // let coworking = { id: newId, ...req.body }
-        // mockCoworkings.push(coworking)
-        Coworking.create({
-            name: "Oasis Coworking",
-            price: { "hour": 4, "day": 21, "month": 100 },
-            address: { "number": "68bis", "street": "avenue Jean Jaurès", "postCode": 33150, "city": "Cenon" },
-            superficy: 200,
-            capacity: 27,
-        })
-
-        const result = { message: `Le coworking a bien été ajouté` }
-        res.json(result)
+    
+        const newCoworking = {... req.body}
+        Coworking.create(newCoworking)
+            .then ((coworking) => {
+                res.json({message: `Le coworking a bien été créé`, data: coworking})
+                console.log(coworking)
+            })
+            .catch ((error) => {
+                res.json({message: `Le coworking n'a pas été ajouté`, data: error.message})
+                console.log(error)
+            })
+        // const result = { message: `Le coworking a bien été ajouté` }
+        // res.json(result)
     })
 
 router
     .route('/:id')
     .get((req, res) => {
-        let result = mockCoworkings.find(el => el.id === parseInt(req.params.id))
 
-        if (!result) {
-            result = `Aucun élément ne correspond à l'id n°${req.params.id}` 
-        }
-        res.json(result)
+       let result = Coworking.findByPk(parseInt(req.params.id))
+        .then((result) => {
+            if(result) {
+                res.json({message: "un coworking a été trouvé", data: result})
+            } else {
+                res.json({message: "Aucun coworking n'a été trouvé"})
+            }
+            
+        })
+        .catch(error => {
+            res.json({message: "une erreur est survenue", data : error.message})
+        })    
+})
+
+    .put((req, res) => { // équivalent à update
+
+        Coworking.update ({ ...req.body}, { // req.body est un objet donc pas besoin de le placer entre {} en retitrant le "..."
+            where : {
+               id : req.params.id  // = ça ne concerne que cette ligen id= ...
+            }
+        })
+
+        .then (result => { // result est le nombre de lignes affectées
+            if(result >0) {
+                res.json({message: "Le coworking a bien été mis à jour ", data: result})
+            } else {
+                res.json({message: "Aucun coworking n'a été mis à jour"})
+            }
+        })
+        .catch (error => {
+            res.json({message: "La mise à jour a merdé", data : error.message})
+        })
     })
-    .put((req, res) => {
-        let coworking = mockCoworkings.find((el) => el.id === parseInt(req.params.id))
 
-        let result;
-        if (coworking) {
-            const newCoworking = { ...coworking, ...req.body }
-            const index = mockCoworkings.findIndex(el => el.id === parseInt(req.params.id))
-            mockCoworkings[index] = newCoworking
-            result = { message: 'Coworking modifié', data: newCoworking }
-        } else {
-            result = { message: `Le coworking n'existe pas`, data: {} }
-        }
-
-        res.json(result)
-    })
     .delete((req, res) => {
-        const coworking = mockCoworkings.find((el) => el.id === parseInt(req.params.id))
-
-        let result;
-        if (coworking) {
-            mockCoworkings = mockCoworkings.filter(el => el.id !== coworking.id)
-            result = { message: 'Coworking supprimé', data: coworking }
-        } else {
-            result = { message: `Le coworking n'existe pas`, data: {} }
-        }
-
-        res.json(result)
+        Coworking.destroy ({
+            where : {
+               id : req.params.id  
+            }
+        })
+        .then (result => { // result est le nombre de lignes affectées
+            if(result > 0) {
+                res.json({message: "Le coworking a bien été supprimé", data: result})
+            } else {
+                res.json({message: "erreeeeeeeeur"})
+            }
+        })
+        .catch (error => {
+            res.json({message: "La suppression a échoué", data : error.message})
+        })     
     })
 
 module.exports = router
