@@ -13,8 +13,11 @@ app.get('/', (req, res) => {
 })
 
 const coworkingRouter = require('./routes/coworkingRoutes')
+const userRouter = require('./routes/userRoutes')
+
 
 app.use('/api/coworkings', coworkingRouter) //tous les endspoint réunient dans ce fichier auront ce router
+app.use('/api/users', userRouter)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
