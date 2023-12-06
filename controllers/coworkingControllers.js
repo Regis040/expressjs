@@ -1,3 +1,4 @@
+// const { Op } = require('sequelize')
 const { Coworking } = require('../db/sequelizeSetup')
 
 const findAllCoworkings = (req, res) => {
@@ -24,34 +25,37 @@ const findCoworkingByPk = (req, res) => {
         })
 }
 
-const createCoworking =(req, res) => {
+const createCoworking = (req, res) => {
     const newCoworking = { ...req.body }
 
     Coworking.create(newCoworking)
         .then((coworking) => {
             res.status(201).json({ message: 'Le coworking a bien été créé', data: coworking })
-            console.log(coworking)
         })
         .catch((error) => {
+            if (error instanceof UniqueConstraintError || error instanceof ValidationError) {
+                return res.status(400).json({ message: error.message })
+            }
             res.status(500).json({ message: `Le coworking n'a pas pu être créé`, data: error.message })
         })
 }
+
 const updateCoworking = (req, res) => {
     Coworking.findByPk(req.params.id)
         .then((result) => {
             if (result) {
-                result.update(req.body)
+                return result.update(req.body)
                     .then(() => {
                         res.status(201).json({ message: 'Le coworking a bien été mis à jour.', data: result })
                     })
-                    .catch(error => {
-                        res.status(500).json({ message: 'La mise à jour a échoué.', data: error.message })
-                    })
             } else {
-                res.status(404).json({ message: `Aucun coworking n'a été mis à jour.` })
+                res.status(404).json({ message: `Aucun coworking à mettre à jour n'a été trouvé.` })
             }
         })
         .catch(error => {
+            if (error instanceof UniqueConstraintError || error instanceof ValidationError) {
+                return res.status(400).json({ message: error.message })
+            }
             res.status(500).json({ message: 'Une erreur est survenue.', data: error.message })
         })
 }
@@ -62,14 +66,10 @@ const deleteCoworking = (req, res) => {
         .then((result) => {
             // B. Si un coworking correspond à l'id alors on exécute la méthode destroy()
             if (result) {
-                result.destroy()
+                return result.destroy()
                     // C. Si le coworking est bien supprimé, on affiche un message avec comme data le coworking récupéré dans le .findByPk()
                     .then((result) => {
                         res.json({ mesage: `Le coworking a bien été supprimé.`, data: result })
-                    })
-                    // D. Si la suppression a échoué, on retourne une réponse à POSTMAN
-                    .catch((error) => {
-                        res.status(500).json({ mesage: `La suppression a échoué.`, data: error.message })
                     })
             } else {
                 // B Si aucun coworking ne correspond à l'id alors on retourne une réponse à POSTMAN
@@ -78,7 +78,7 @@ const deleteCoworking = (req, res) => {
         })
         .catch((error) => {
             // E. Si une erreur est survenue dès le findByPk, on retourne une réponse à POSTMAN
-            res.status(500).json({ mesage: `La requête n'a pas aboutie.` })
+            res.status(500).json({ mesage: `La requête n'a pas aboutie.`, data: error.message })
         })
 }
 

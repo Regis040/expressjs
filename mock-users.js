@@ -1,31 +1,18 @@
 const users = [
     {
-        id: 1,
-        username: "Wredgis",
+        username: "pauldoazan",
         password: "mdp",
-        email:"wredgis@gmail.com",
-        created: new Date()
+        email:"pauldoazan@gmail.com"
     },
     {
-        id: 2,
-        username: "Roberta",
+        username: "mathildedoazan",
         password: "mdp",
-        email:"roberta@gmail.com",
-        created: new Date()
+        email:"athildedoazan@gmail.com"
     },
     {
-        id: 3,
-        username: "Coco",
+        username: "antoinedupont",
         password: "mdp",
-        email:"coco@gmail.com",
-        created: new Date()
-    },
-    {
-        id: 4,
-        username: "Bisca",
-        password: "mdp",
-        email:"bisca@gmail.com",
-        created: new Date()
+        email:"pantoinedupont@gmail.com"
     }
 ];
 

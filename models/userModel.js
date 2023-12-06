@@ -6,13 +6,20 @@ module.exports = (sequelize, DataTypes) => {
             unique: {
                 msg: "Le nom est déjà pris."
             },
+            validate: {
+                len: {
+                    msg: "Le nom d'utilisateur doit avoir un nombre de caractères compris entre 8 et 40.",
+                    args: [8, 40]
+                }
+            },
         },        
         password: {
             type: DataTypes.STRING,   
             allowNull: false
         },
         email: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            isEmail: true
         },
     });    
 }

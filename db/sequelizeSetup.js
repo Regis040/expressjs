@@ -1,9 +1,11 @@
 // B. On importe le gabarit du Model Coworking défini dans le fichier ./models/coworking'
 const CoworkingModel = require('../models/coworkingModel')
+const UserModel = require('../models/userModel')
 const { Sequelize, DataTypes } = require('sequelize');
 const mockCoworkings = require('../mock-coworkings')
-const UserModel = require('../models/userModel')
-const arrayUsers = require('../mock-users');
+const mockUsers = require('../mock-users');
+const { hash } = require('bcrypt');
+const bcrypt = require('bcrypt')
 
 // A. On créé une instance de bdd qui communique avec Xampp 
 const sequelize = new Sequelize('bordeaux_coworkings', 'root', '', {
@@ -15,6 +17,7 @@ const sequelize = new Sequelize('bordeaux_coworkings', 'root', '', {
 // C. On instancie un Model qui permettra d'interpréter le Javascript avec la Table SQL correspondante
 const Coworking = CoworkingModel(sequelize, DataTypes)
 const User = UserModel(sequelize, DataTypes)
+// const User = UserModel(sequelize, DataTypes)
 
 // D. On synchronise la BDD avec les models défini dans notre API
 sequelize.sync({ force: true })
@@ -27,15 +30,17 @@ sequelize.sync({ force: true })
                     console.log(error.message)
                 })
         })
-       arrayUsers.forEach((element) => {
-            const newUsers = { ...element }
-            User.create(newUsers)
+
+        mockUsers.forEach(user => {
+            bcrypt.hash(user.password, 10)
+            .then((hash) =>{
+                User.create({ ...user, password: hash }) // ... user: création d'un nouvel objet user
                 .then(() => { })
                 .catch((error) => {
                     console.log(error.message)
                 })
+            });          
         })
-
     })
     .catch(error => {
         console.log(error)
