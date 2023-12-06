@@ -1,28 +1,18 @@
 const express = require('express')
 const router = express.Router()
+const { findAllUsers, findUserByPk, createUser, updateUser, deleteUser } = require(`../controllers/userControllers`)
 
 // const { User} = require('../db/sequelizeSetup')
 
 router
     .route('/')
-    .get((req, res) => {        
-        res.send("response get");
-    })
-
-    .post((req, res) => {
-        res.send("response post");
-    })
+    .get(findAllUsers)
+    .post(createUser)
 
 router
     .route('/:id')
-    .get((req, res) => {
-        res.send("response get id");
-    })
-    .put((req, res) => {
-        res.send("response put");
-    })
-    .delete((req, res) => {
-        res.send("response delete");
-    })
-
+    .get(findUserByPk)
+    .put(updateUser)
+    .delete(deleteUser)
+    
 module.exports = router
