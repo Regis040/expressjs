@@ -20,8 +20,8 @@ const login = (req, res) => {
                     const token = jwt.sign({
                         data: result.username
                     }, SECRET_KEY, { expiresIn: '1h' });
-                    
-                    res.cookie(`coworkingapi-jwt`, token)
+
+                    res.cookie('coworkingapi_jwt', token)
                     res.json({ message: `Login réussi`, data: token })
                 })
                 .catch(error => {
@@ -34,11 +34,18 @@ const login = (req, res) => {
 }
 
 const protect = (req, res, next) => {
-    if (!req.headers.authorization) {
+    // console.log(req.headers)
+    // if (!req.headers.authorization) {
+    //     return res.status(401).json({ message: `Vous n'êtes pas authentifié.` })
+    // }
+
+    // const token = req.headers.authorization.split(' ')[1]
+
+    if (!req.cookies.coworkingapi_jwt) {
         return res.status(401).json({ message: `Vous n'êtes pas authentifié.` })
     }
 
-    const token = req.headers.authorization.split(' ')[1]
+    const token = req.cookies.coworkingapi_jwt
 
     if (token) {
         try {
@@ -77,7 +84,6 @@ const restrict = (req, res, next) => {
 }
 
 // Implémenter le middleware qui sera utilisé sur updateCoworking et deleteCoworking, qui permmettra d'interagir sur la ressource seulement si on en est l'auteur. Si ce n'est pas le cas, on renvoie une erreur 403.
-
 const restrictToOwnUser = (req, res, next) => {
     User.findOne(
         {
@@ -90,9 +96,7 @@ const restrictToOwnUser = (req, res, next) => {
             }
             Coworking.findByPk(req.params.id)
                 .then(coworking => {
-                    const str = 'hello'
-                    str = 'world'
-                    if (!coworking) return res.status(404).json({ mesage: `La ressource n'existe pas.` })
+                    if (!coworking) return res.status(404).json({ message: `La ressource n'existe pas.` })
                     if (user.id === coworking.UserId) {
                         next()
                     } else {

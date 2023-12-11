@@ -4,28 +4,32 @@ const cookieParser = require('cookie-parser')
 const app = express()
 const port = 3000
 
-const { sequelize } = require('./db/sequelizeSetup')
+// const { sequelize } = require('./db/sequelizeSetup')
 
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cookieParser())
 
 app.get('/', (req, res) => {
-    res.json(req.cookies) // je fais une requete
-    res.cookie(`estDejaVuSurLeSite`, true) // je reçois une réponse
-    
+    // Exemple d'un cookie de première visite d'un site
+
+    // console.log(req.cookies)
+    // res.cookie('monapirest_estdejavenu', true)
+    // if (req.cookies.monapirest_estdejavenu) {
+    //     res.json('Hello World !')
+    // } else {
+    //     res.json('Salut tu es nouveau !')
+    // }
+
     res.json('Hello World !')
 })
 
 const coworkingRouter = require('./routes/coworkingRoutes')
 const userRouter = require('./routes/userRoutes')
 
-
-app.use('/api/coworkings', coworkingRouter) //tous les endspoint réunient dans ce fichier auront ce router
+app.use('/api/coworkings', coworkingRouter)
 app.use('/api/users', userRouter)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
-
-

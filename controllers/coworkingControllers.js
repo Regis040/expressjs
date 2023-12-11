@@ -27,7 +27,6 @@ const findCoworkingByPk = (req, res) => {
 }
 
 const createCoworking = (req, res) => {
-
     // Ajouter foreignKey UserId sur le coworking de façon automatique, en se basant sur l'authenification précédente dans le middleware protect
     User.findOne({ where: { username: req.username } })
         .then(user => {
