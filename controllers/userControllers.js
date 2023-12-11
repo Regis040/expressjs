@@ -39,7 +39,10 @@ const createUser = (req, res) => {
                     }
                     res.status(500).json({ message: `L'utilisateur n'a pas pu être créé`, data: error.message })
                 })
-        });
+        })
+        .catch(error => {
+            console.log(error.message)
+        })
 }
 
 const updateUser = (req, res) => {

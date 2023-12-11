@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
             unique: {
-                msg: "Le nom est déjà pris."
+                msg: "Le nom d'utilisateur est déjà pris."
             },
             validate: {
                 len: {
@@ -12,14 +12,11 @@ module.exports = (sequelize, DataTypes) => {
                     args: [8, 40]
                 }
             },
-        },        
+        },
         password: {
-            type: DataTypes.STRING,   
-            allowNull: false
-        },
-        email: {
             type: DataTypes.STRING,
-            isEmail: true
-        },
-    });    
+            allowNull: false
+        }
+    }
+    );
 }
