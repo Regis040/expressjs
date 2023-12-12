@@ -3,7 +3,8 @@ const { UniqueConstraintError, ValidationError } = require('sequelize')
 const { Coworking, User } = require('../db/sequelizeSetup')
 
 const findAllCoworkings = (req, res) => {
-    Coworking.findAll()
+    // paramètre optionnel qui permet 
+    Coworking.findAll({include: Review})
         .then((results) => {
             res.json(results)
         })
@@ -11,6 +12,18 @@ const findAllCoworkings = (req, res) => {
             res.status(500).json(error.message)
         })
 }
+
+const findAllCoworkingsRawsql = (req, res) => {
+    // paramètre optionnel qui permet 
+    Coworking.findAll({include: Review})
+        .then((results) => {
+            res.json(results)
+        })
+        .catch(error => {
+            res.status(500).json(error.message)
+        })
+}
+
 
 const findCoworkingByPk = (req, res) => {
     Coworking.findByPk((parseInt(req.params.id)))

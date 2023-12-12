@@ -21,8 +21,8 @@ const login = (req, res) => {
                         data: result.username
                     }, SECRET_KEY, { expiresIn: '1h' });
 
-                    res.cookie('coworkingapi_jwt', token)
-                    res.json({ message: `Login réussi`, data: token })
+                    // res.cookie('coworkingapi_jwt', token) // cookie style
+                    // res.json({ message: `Login réussi`, data: token })
                 })
                 .catch(error => {
                     console.log(error.message)
@@ -35,22 +35,23 @@ const login = (req, res) => {
 
 const protect = (req, res, next) => {
     // console.log(req.headers)
-    // if (!req.headers.authorization) {
+    console.log(req.headers.authorization)
+    if (!req.headers.authorization) {
+        return res.status(401).json({ message: `Vous n'êtes pas authentifié.` })
+    }
+    const token = req.headers.authorization.split(' ')[1]
+    
+    // Possibilité de stocker le jwt dasn un cookie côté client
+    // if (!req.cookies.coworkingapi_jwt) {
     //     return res.status(401).json({ message: `Vous n'êtes pas authentifié.` })
     // }
 
-    // const token = req.headers.authorization.split(' ')[1]
-
-    if (!req.cookies.coworkingapi_jwt) {
-        return res.status(401).json({ message: `Vous n'êtes pas authentifié.` })
-    }
-
-    const token = req.cookies.coworkingapi_jwt
+    // const token = req.cookies.coworkingapi_jwt
 
     if (token) {
         try {
             const decoded = jwt.verify(token, SECRET_KEY);
-            req.username = decoded.data
+            req.username = decoded.data // username est une propriété
             next()
         } catch (error) {
             return res.status(403).json({ message: `Le token n'est pas valide.` })
