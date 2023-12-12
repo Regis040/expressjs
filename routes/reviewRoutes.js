@@ -1,18 +1,18 @@
-// findAllCoworkings, findByPk,  create
 const express = require('express')
 const router = express.Router()
-const { findAllReviews, findReviewByPk, createReview } = require('../controllers/reviewControllers')
-const { protect, restrict } = require('../controllers/authControllers')
+const { findAllReviews, findReviewByPk, createReview, updateReview, deleteReview } = require('../controllers/reviewControllers')
+const { protect, restrictToOwnUser } = require('../controllers/authControllers')
+const { Review } = require('../db/sequelizeSetup')
 
 router
     .route('/')
     .get(findAllReviews)
-    .post(protect, createReview) // combien de middleware traversés ? 4 ... dans app.js :app.use(express.json), idem avec morgan, route avec app.use (route) et protect
+    .post(protect, createReview)
 
 router
     .route('/:id')
     .get(findReviewByPk)
-    // .put(protect,  updateCoworking)
-    // .delete(protect, deleteCoworking)
+    .put(protect, restrictToOwnUser(Review), updateReview)
+    .delete(protect, restrictToOwnUser(Review), deleteReview)
 
-module.exports = router
+module.exports = router 
