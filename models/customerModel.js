@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
                 msg: "Le mail est déjà pris."
             },
         },
+        gender: {
+            type: DataTypes.STRING
+        },
+        age: {
+            type: DataTypes.INTEGER
+        }
     }
     );
 }

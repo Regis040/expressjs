@@ -3,10 +3,9 @@ const UserModel = require('../models/userModel')
 const RoleModel = require('../models/roleModel')
 const { Sequelize, DataTypes } = require('sequelize');
 const { setCoworkings, setUsers, setRoles, setCustomers, setRegistrations } = require('./setDataSample');
-const customerModel = require('../models/customerModel');
-const registrationModel = require('../models/registrationModel');
 const reviewModel = require('../models/reviewModel');
-
+// const customerModel = require('../models/customerModel');
+// const registrationModel = require('../models/registrationModel');
 
 const sequelize = new Sequelize('bordeaux_coworkings', 'root', '', {
     host: 'localhost',
@@ -15,36 +14,34 @@ const sequelize = new Sequelize('bordeaux_coworkings', 'root', '', {
 });
 
 const Role = RoleModel(sequelize, DataTypes)
-const User = UserModel(sequelize, DataTypes)
+const User = UserModel(sequelize, DataTypes) 
 const Coworking = CoworkingModel(sequelize, DataTypes)
 const Review = reviewModel(sequelize, DataTypes)
-const Customer = customerModel(sequelize, DataTypes)
-const Registration = registrationModel(sequelize, DataTypes, Coworking, Customer)
+// const Customer = customerModel(sequelize, DataTypes)
+// const Registration = registrationModel(sequelize, DataTypes, Coworking, Customer)
 
 Role.hasMany(User)
 User.belongsTo(Role)
 
-User.hasMany(Coworking) // definit une clé étrangère
+User.hasMany(Coworking)
 Coworking.belongsTo(User)
 
-//  Pour review ... il y a 2 clés étrangères : userId et CoworkingId
 User.hasMany(Review)
-Review.belongsTo(User) // la clé étrangère appartient à review
+Review.belongsTo(User)
 
 Coworking.hasMany(Review)
 Review.belongsTo(Coworking)
 
-
-// Coworking.belongsToMany(Customer, { through: Registration }); // many to many
-// Customer.belongsToMany(Coworking, { through: Registration }); // many to many
+// Coworking.belongsToMany(Customer, { through: Registration });
+// Customer.belongsToMany(Coworking, { through: Registration });
 
 sequelize.sync({ force: true })
     .then(async () => {
         await setRoles(Role)
         await setUsers(User)
         await setCoworkings(Coworking)
-        // await setCustomers(Customer) // many to many
-        // setRegistrations(Registration) // many to many
+        // await setCustomers(Customer)
+        // setRegistrations(Registration)
     })
     .catch(error => {
         console.log(error)
@@ -56,4 +53,4 @@ sequelize.authenticate()
     .catch(error => console.error(`Impossible de se connecter à la base de données ${error}`))
 
 
-module.exports = { Coworking, User, Role, Review }
+module.exports = { Coworking, User, Role, Review, sequelize }
