@@ -27,7 +27,7 @@ const setUsers = (User) => {
 }
 
 const setRoles = (Role) => {
-    return Promise.all([Role.create({ label: "admin" }), Role.create({ label: "edit" })])
+    return Promise.all([Role.create({ label: "admin" }), Role.create({ label: "edit" }), Role.create({ label: "superadmin" })])
 }
 
 const setCustomers = (Customer) => {

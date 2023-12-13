@@ -15,7 +15,7 @@ router
 router
     .route('/:id')
     .get(findUserByPk)
-    .put(updateUser)
-    .delete(protect, restrict, deleteUser)
+    .put(protect, restrict("admin"), updateUser)
+    .delete(protect, restrict("superadmin"), deleteUser)
 
 module.exports = router

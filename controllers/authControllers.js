@@ -3,6 +3,12 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = require('../configs/tokenData')
 
+const rolesHierarchy = {
+    edit: ["edit"],
+    admin :["admin", "edit"],
+    superadmin :["superadmin", "admin", "edit"]
+}
+
 const login = (req, res) => {
     // A. On vérifie que l'utilisateur qui tente de se connecter existe bel et bien dans notre BDD
     User.findOne({ where: { username: req.body.username } })
@@ -19,7 +25,7 @@ const login = (req, res) => {
                     }
                     const token = jwt.sign({
                         data: result.username
-                    }, SECRET_KEY, { expiresIn: '1h' });
+                    }, SECRET_KEY, { expiresIn: '10h' });
 
                     // Possibilité de stocker le jwt dans un cookie côté client
                     // res.cookie('coworkingapi_jwt', token)
@@ -60,28 +66,31 @@ const protect = (req, res, next) => {
 }
 
 // implémenter le middleware pour interdire l'accès aux utilisateurs non admin
-const restrict = (req, res, next) => {
-    User.findOne({
-        where: {
-            username: req.username
-        }
-    })
-        .then(user => {
-            Role.findByPk(user.RoleId)
-                .then(role => {
-                    if (role.label === 'admin') {
-                        next()
-                    } else {
-                        res.status(403).json({ message: `Droits insuffisants` })
-                    }
-                })
-                .catch(error => {
-                    console.log(error.message)
-                })
+// ajouter le paramètre labelrole
+const restrict = (labelRole) => {
+    return (req, res, next) => {
+        User.findOne({
+            where: {
+                username: req.username
+            }
         })
-        .catch(error => {
-            console.log(error)
-        })
+            .then(user => {
+                Role.findByPk(user.RoleId)
+                    .then(role => {
+                        if (rolesHierarchy[role.label].includes(labelRole)) {
+                            next()
+                        } else {
+                            res.status(403).json({ message: `Droits insuffisants` })
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.message)
+                    })
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
 }
 
 // Implémenter le middleware qui sera utilisé sur updateCoworking et deleteCoworking, qui permmettra d'interagir sur la ressource seulement si on en est l'auteur. Si ce n'est pas le cas, on renvoie une erreur 403.

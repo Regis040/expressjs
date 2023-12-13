@@ -14,6 +14,7 @@ const findAllCoworkings = (req, res) => {
 }
 
 const findAllCoworkingsRawSQL = (req, res) => {
+    // jointure entre cowrokings et les review ... les reviews ont une clé étrangère qui pointe vers les coworkings
     sequelize.query("SELECT name,rating FROM coworkings LEFT JOIN reviews ON coworkings.id = reviews.CoworkingId", { type: QueryTypes.SELECT })
         .then((results) => {
             res.json(results)
