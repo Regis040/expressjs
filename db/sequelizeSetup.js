@@ -13,8 +13,10 @@ const sequelize = new Sequelize('bordeaux_coworkings', 'root', '', {
     logging: false
 });
 
+
+
 const Role = RoleModel(sequelize, DataTypes)
-const User = UserModel(sequelize, DataTypes) 
+const User = UserModel(sequelize, DataTypes)
 const Coworking = CoworkingModel(sequelize, DataTypes)
 const Review = reviewModel(sequelize, DataTypes)
 // const Customer = customerModel(sequelize, DataTypes)

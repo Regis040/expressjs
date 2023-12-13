@@ -20,3 +20,4 @@ router
     .delete(protect, restrictToOwnUser(Coworking), deleteCoworking)
 
 module.exports = router
+

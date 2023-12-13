@@ -5,8 +5,8 @@ const SECRET_KEY = require('../configs/tokenData')
 
 const rolesHierarchy = {
     edit: ["edit"],
-    admin :["admin", "edit"],
-    superadmin :["superadmin", "admin", "edit"]
+    admin: ["admin", "edit"],
+    superadmin: ["superadmin", "admin", "edit"],
 }
 
 const login = (req, res) => {
@@ -65,8 +65,7 @@ const protect = (req, res, next) => {
     }
 }
 
-// implémenter le middleware pour interdire l'accès aux utilisateurs non admin
-// ajouter le paramètre labelrole
+// Ajouter le paramètre labelRole
 const restrict = (labelRole) => {
     return (req, res, next) => {
         User.findOne({
@@ -108,13 +107,13 @@ const restrictToOwnUser = (model) => {
                 // on teste d'abord si le user est admin
                 return Role.findByPk(user.RoleId)
                     .then(role => {
-                        if (role.label === 'admin') {
+                        if (rolesHierarchy[role.label].includes('admin')) {
                             return next()
                         }
                         model.findByPk(req.params.id)
-                            .then(coworking => {
-                                if (!coworking) return res.status(404).json({ message: `La ressource n'existe pas.` })
-                                if (user.id === coworking.UserId) {
+                            .then(resource => {
+                                if (!resource) return res.status(404).json({ message: `La ressource n'existe pas.` })
+                                if (user.id === resource.UserId) {
                                     next()
                                 } else {
                                     res.status(403).json({ message: `Vous n'êtes pas l'auteur de la ressource.` })
@@ -129,7 +128,37 @@ const restrictToOwnUser = (model) => {
     }
 }
 
-module.exports = { login, protect, restrict, restrictToOwnUser }
+const correctUser = (req, res, next) => {
+    User.findOne({ where: { username: req.username } })
+        .then(authUser => {
+            console.log(authUser.id, parseInt(req.params.id))
+            if (authUser.id === parseInt(req.params.id)) {
+                next()
+            } else {
+                res.status(403).json({ message: "Droits insuffisants." })
+            }
+            // Role.findByPk(authUser.RoleId)
+            //     .then(role => {
+            //         // if (rolesHierarchy[role.label].includes('admin')) {
+            //         //     return next()
+            //         // }
+
+            //         if (authUser.id === req.params.id) {
+            //             next()
+            //         } else {
+            //             res.status(403).json({ message: "Droits insuffisants." })
+            //         }
+            //     })
+        })
+        .catch(error => {
+            res.status(500).json({ message: error.message })
+        })
+    // if (result.id !== req.params.id) {
+    //     return res.status(403).json({ message: 'Droits insuffisants.' })
+    // }
+}
+
+module.exports = { login, protect, restrict, restrictToOwnUser, correctUser }
 
 
 

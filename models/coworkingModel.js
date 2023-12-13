@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
                     args: [2, 50]
                 }
             },
-        },        
+        },
         price: {
             type: DataTypes.JSON,
             validate: {
@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                     } else {
                         throw new Error(`La syntaxe des tarifs n'est pas correcte.`)
                     }
+
                 }
             }
         },
@@ -48,7 +49,12 @@ module.exports = (sequelize, DataTypes) => {
                     msg: "La superficie doit être un entier."
                 }
             }
+        },
+        imageUrl: {
+            type: DataTypes.STRING
         }
+    }, {
+        onDelete: 'CASCADE'
     }
     );
 }

@@ -12,7 +12,7 @@ const users = [
     {
         username: "antoinedupont",
         password: "mdp",
-        RoleId: 2
+        RoleId: 3
     }
 ];
 
