@@ -11,7 +11,7 @@ const rolesHierarchy = {
 
 const login = (req, res) => {
     // A. On vérifie que l'utilisateur qui tente de se connecter existe bel et bien dans notre BDD
-    User.findOne({ where: { username: req.body.username } })
+    User.scope('withPassword').findOne({ where: { username: req.body.username } })
         .then((result) => {
             // B. Si l'utilisateur n'existe pas, on renvoie une réponse erreur Client
             if (!result) {
