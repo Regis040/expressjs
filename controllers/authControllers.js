@@ -24,7 +24,11 @@ const login = (req, res) => {
                         return res.status(401).json({ message: `Le mot de passe n'est pas valide.` })
                     }
                     const token = jwt.sign({
-                        data: result.username
+                        data: {
+                           username: result.username,
+                           role: result.RoleId
+                        }
+                        
                     }, SECRET_KEY, { expiresIn: '10h' });
 
                     // Possibilité de stocker le jwt dans un cookie côté client
@@ -57,7 +61,7 @@ const protect = (req, res, next) => {
     if (token) {
         try {
             const decoded = jwt.verify(token, SECRET_KEY);
-            req.username = decoded.data
+            req.username = decoded.data.username
             next()
         } catch (error) {
             return res.status(403).json({ message: `Le token n'est pas valide.` })
@@ -65,7 +69,7 @@ const protect = (req, res, next) => {
     }
 }
 
-// Ajouter le paramètre labelRole
+// Ajoute le paramètre labelRole
 const restrict = (labelRole) => {
     return (req, res, next) => {
         User.findOne({
@@ -92,7 +96,7 @@ const restrict = (labelRole) => {
     }
 }
 
-// Implémenter le middleware qui sera utilisé sur updateCoworking et deleteCoworking, qui permmettra d'interagir sur la ressource seulement si on en est l'auteur. Si ce n'est pas le cas, on renvoie une erreur 403.
+//  middleware qui sera utilisé sur updateCoworking et deleteCoworking, qui permmettra d'interagir sur la ressource seulement si on en est l'auteur. Si ce n'est pas le cas, on renvoie une erreur 403.
 const restrictToOwnUser = (model) => {
     return (req, res, next) => {
         User.findOne(
